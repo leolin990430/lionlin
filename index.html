@@ -1,0 +1,85 @@
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>我的歌單</title>
+<style>
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans TC",sans-serif;
+  margin:24px;
+  background:#fafafa;
+}
+h1{margin-bottom:20px}
+button{
+  padding:8px 12px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  background:white;
+  cursor:pointer;
+}
+.card{
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:12px;
+  margin:10px 0;
+  background:white;
+}
+.muted{
+  color:#666;
+  font-size:13px;
+}
+</style>
+</head>
+<body>
+  <h1>我的歌單</h1>
+  <p class="muted" id="status">尚未載入</p>
+  <div id="list"></div>
+  <script>
+
+// ===============================
+// ⭐ 這一行等等要改成你的 Google Sheet CSV 網址
+// ===============================
+const SHEET_CSV_URL = "PASTE_YOUR_PUBLISHED_CSV_URL_HERE";
+
+async function load(){
+
+  const status = document.getElementById("status");
+  const list = document.getElementById("list");
+
+  try{
+    status.innerText = "載入中...";
+
+    const res = await fetch(SHEET_CSV_URL);
+    const text = await res.text();
+
+    const rows = text.split("\n");
+    rows.shift(); // 移除標題列
+
+    let html="";
+
+    rows.forEach(r=>{
+      const col = r.split(",");
+      if(col.length >= 2){
+        html += `
+          <div class="card">
+            <b>${col[0]}</b><br>
+            <span class="muted">${col[1]}</span>
+          </div>
+        `;
+      }
+    });
+
+    list.innerHTML = html;
+    status.innerText = "載入完成";
+
+  }catch(e){
+    status.innerText = "載入失敗，請確認 Google Sheet 已發佈為 CSV";
+  }
+}
+
+load();
+
+</script>
+</body>
+</html>
+:::
